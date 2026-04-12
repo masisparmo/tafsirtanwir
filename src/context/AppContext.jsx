@@ -134,7 +134,7 @@ export const AppProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [apiKeys, gasUrl]);
+  }, [apiKeys]);
 
   const processWithAI = async (autoVerse = null) => {
     const targetVerse = autoVerse || currentVerse;
