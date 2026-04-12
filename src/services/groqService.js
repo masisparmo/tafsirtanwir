@@ -60,7 +60,7 @@ FORMAT OUTPUT HARUS JSON VALID:
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            model: 'openai/gpt-oss-120b',
+            model: 'llama-3.3-70b-versatile',
             messages: [
               { role: 'system', content: 'Anda adalah asisten ahli Tafsir yang selalu memberikan output dalam format JSON valid.' },
               { role: 'user', content: prompt }
