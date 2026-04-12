@@ -74,12 +74,17 @@ export const AppProvider = ({ children }) => {
       // 1. Cek di IndexedDB (Lokal)
       setStatusMessage('Mencari di database lokal...');
       const localData = await tafsirService.getCachedVerse(surah, ayah);
-      if (localData) {
+      
+      // Validasi: Jika teks Arab mengandung huruf latin, berarti cache usang/salah (transliterasi)
+      const isLatin = localData && /[a-zA-Z]/.test(localData.arabic);
+
+      if (localData && !isLatin) {
         setActiveTafsir(localData);
         setStatusMessage('');
         setIsLoading(false);
         return;
       }
+      if (isLatin) console.warn('Cache terdeteksi transliterasi, melompati ke fetch baru...');
 
       // 2. Cek di Google Sheets (Cloud)
       if (GAS_URL) {
