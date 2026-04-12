@@ -21,7 +21,7 @@ function App() {
 
         <footer className="bg-slate-900 text-slate-400 py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p className="text-sm">© 2026 Tafsir Interaktif At-Tahrir wat-Tanwir</p>
+            <p className="text-sm">© 2026 Tafsir At Tahrir wat Tanwir</p>
             <p className="text-xs mt-2 italic text-slate-500">
               "Lisanul Arabiyah Huwa Miftaahu Fahmil Qur'an"
             </p>

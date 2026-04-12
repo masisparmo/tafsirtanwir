@@ -15,7 +15,7 @@ const Header = () => {
             <BookOpen className="text-white w-6 h-6" />
           </div>
           <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-800 to-emerald-600 hidden sm:block">
-            Tafsir Interaktif
+            Tafsir At Tahrir wat Tanwir
           </h1>
         </div>
 
