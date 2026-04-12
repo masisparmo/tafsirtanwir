@@ -7,8 +7,8 @@ export const groqService = {
     const keys = apiKeysString.split(',').map(k => k.trim()).filter(k => k);
     if (keys.length === 0) throw new Error('API Key tidak valid.');
 
-  const truncatedTafsir = arabicTafsirText.length > 8000 
-      ? arabicTafsirText.substring(0, 8000) + "... [Teks dipotong karena terlalu panjang]"
+  const truncatedTafsir = arabicTafsirText.length > 3500 
+      ? arabicTafsirText.substring(0, 3500) + "... [Teks dipotong agar AI lebih cepat]"
       : arabicTafsirText;
 
     const prompt = `
@@ -51,7 +51,7 @@ FORMAT OUTPUT HARUS JSON VALID:
 
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 45000);
+        const timeoutId = setTimeout(() => controller.abort(), 120000);
 
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
@@ -83,7 +83,7 @@ FORMAT OUTPUT HARUS JSON VALID:
         return JSON.parse(data.choices[0].message.content);
 
       } catch (error) {
-        console.warn(`Kunci ke-${currentKeyIndex + 1} gagal:`, error.message);
+        console.warn(`Kunci ke-${currentKeyIndex + 1} gagal (${attempts + 1}/${keys.length}):`, error.message);
         lastErrorMessage = error.message;
         
         // Rotasi ke kunci berikutnya untuk percobaan selanjutnya
