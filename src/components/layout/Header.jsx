@@ -25,35 +25,34 @@ const Header = () => {
 
         <div className="flex items-center space-x-4">
           {/* Mode Toggle Selection */}
-          <div className="flex items-center bg-slate-100 p-1 rounded-2xl relative">
+          <div className="flex items-center bg-slate-100 p-1 rounded-2xl relative w-64">
             <motion.div
               className="absolute h-[calc(100%-8px)] rounded-xl bg-white shadow-md z-0"
               animate={{
-                x: mode === 'pencari' ? 4 : '100%',
-                left: mode === 'pencari' ? 0 : -4,
-                width: mode === 'pencari' ? 'calc(50% - 4px)' : 'calc(50% - 4px)'
+                x: mode === 'pencari' ? 0 : '100%',
               }}
+              style={{ width: 'calc(50% - 4px)' }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
             />
 
             <button
               onClick={() => setMode('pencari')}
-              className={`relative z-10 flex items-center space-x-2 px-4 py-2 transition-colors duration-200 ${
+              className={`relative z-10 flex-1 flex items-center justify-center space-x-2 px-2 py-2 transition-colors duration-200 ${
                 mode === 'pencari' ? 'text-emerald-700 font-semibold' : 'text-slate-500'
               }`}
             >
               <BookOpen className="w-4 h-4" />
-              <span className="text-sm hidden sm:inline">Pencari Ilmu</span>
+              <span className="text-sm">Pencari Ilmu</span>
             </button>
 
             <button
               onClick={() => setMode('ustadz')}
-              className={`relative z-10 flex items-center space-x-2 px-4 py-2 transition-colors duration-200 ${
+              className={`relative z-10 flex-1 flex items-center justify-center space-x-2 px-2 py-2 transition-colors duration-200 ${
                 mode === 'ustadz' ? 'text-emerald-700 font-semibold' : 'text-slate-500'
               }`}
             >
               <GraduationCap className="w-4 h-4" />
-              <span className="text-sm hidden sm:inline">Ustadz</span>
+              <span className="text-sm">Ustadz</span>
             </button>
           </div>
 
