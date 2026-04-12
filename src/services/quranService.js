@@ -118,7 +118,7 @@ export const QURAN_METADATA = [
 export const quranService = {
   async getAyahText(surahNumber, ayahNumber) {
     try {
-      const response = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}`);
+      const response = await fetch(`https://api.alquran.cloud/v1/ayah/${surahNumber}:${ayahNumber}/quran-uthmani`);
       const data = await response.json();
       return data.data.text;
     } catch (error) {
