@@ -91,7 +91,9 @@ export const AppProvider = ({ children }) => {
         setStatusMessage('Mencari di Cloud (Google Sheets)...');
         try {
           const cloudData = await gasService.searchInCloud(GAS_URL, surah, ayah);
-          if (cloudData) {
+          const hasArabicCloud = cloudData && /[\u0600-\u06FF]/.test(cloudData.arabic);
+          
+          if (cloudData && hasArabicCloud) {
             setActiveTafsir(cloudData);
             // Simpan ke lokal untuk penggunaan offline masa depan
             await tafsirService.saveCachedVerse(surah, ayah, cloudData);
@@ -99,6 +101,7 @@ export const AppProvider = ({ children }) => {
             setIsLoading(false);
             return;
           }
+          if (cloudData && !hasArabicCloud) console.warn('Data Cloud terdeteksi non-Arab, mengabaikan dan memicu AI baru...');
         } catch (cloudErr) {
           console.warn('Cloud search failed, skipping to AI...', cloudErr);
         }
