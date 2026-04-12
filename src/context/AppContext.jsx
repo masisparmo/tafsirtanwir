@@ -19,9 +19,9 @@ export const AppProvider = ({ children }) => {
   const [fullDatabase, setFullDatabase] = useState(null);
   
   // --- AI & Energy State ---
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbyRVo38ZvBHGNcH3sAP3J6klNfnXrM9KJguOjOsiHG8cPLhbto0gqpOWf_9qzwX1x87/exec';
   const defaultKeys = ""; 
   const [apiKeys, setApiKeys] = useState(() => localStorage.getItem('groq_api_keys') || defaultKeys);
-  const [gasUrl, setGasUrl] = useState(() => localStorage.getItem('tafsir_gas_url') || 'https://script.google.com/macros/s/AKfycbyRVo38ZvBHGNcH3sAP3J6klNfnXrM9KJguOjOsiHG8cPLhbto0gqpOWf_9qzwX1x87/exec');
   const isInitialMount = useRef(true);
 
   // --- Loading States ---
@@ -46,10 +46,6 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem('groq_api_keys', apiKeys);
   }, [apiKeys]);
-
-  useEffect(() => {
-    localStorage.setItem('tafsir_gas_url', gasUrl);
-  }, [gasUrl]);
 
   // Load Database di Awal (Sesuai permintaan user)
   useEffect(() => {
@@ -86,10 +82,10 @@ export const AppProvider = ({ children }) => {
       }
 
       // 2. Cek di Google Sheets (Cloud)
-      if (gasUrl) {
+      if (GAS_URL) {
         setStatusMessage('Mencari di Cloud (Google Sheets)...');
         try {
-          const cloudData = await gasService.searchInCloud(gasUrl, surah, ayah);
+          const cloudData = await gasService.searchInCloud(GAS_URL, surah, ayah);
           if (cloudData) {
             setActiveTafsir(cloudData);
             // Simpan ke lokal untuk penggunaan offline masa depan
@@ -147,7 +143,7 @@ export const AppProvider = ({ children }) => {
       setStatusMessage('Menunggu database tafsir siap...');
       return;
     }
-    if (!apiKeys) {
+    if (!apiKeys || apiKeys.trim() === "") {
       setStatusMessage('API Key belum diatur. Silakan cek Pengaturan.');
       setIsSettingsOpen(true);
       return;
@@ -176,9 +172,9 @@ export const AppProvider = ({ children }) => {
       await tafsirService.saveCachedVerse(targetVerse.surah, targetVerse.ayah, result);
       
       // Simpan ke Cloud (Google Sheets)
-      if (gasUrl) {
+      if (GAS_URL) {
         setStatusMessage('Menyinkronkan ke Cloud...');
-        await gasService.saveToCloud(gasUrl, targetVerse.surah, targetVerse.ayah, result);
+        await gasService.saveToCloud(GAS_URL, targetVerse.surah, targetVerse.ayah, result);
       }
 
       setActiveTafsir(result);
@@ -208,7 +204,7 @@ export const AppProvider = ({ children }) => {
       currentVerse, changeVerse,
       activeTafsir,
       apiKeys, setApiKeys,
-      gasUrl, setGasUrl,
+      gasUrl: GAS_URL,
       isLoading, statusMessage,
       dbDownloadProgress,
       isSettingsOpen, setIsSettingsOpen,
