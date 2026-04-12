@@ -1,14 +1,14 @@
 let currentKeyIndex = 0;
 
 export const groqService = {
-  async extractTafsirInfo(arabicTafsirText, ayahArabicText, apiKeysString, surahName, ayahNumber) {
+  async extractTafsirInfo(arabicTafsirText, ayahArabicText, apiKeysString, surahName, ayahNumber, onProgress) {
     if (!apiKeysString) throw new Error('API Key belum diatur. Silakan atur di menu Pengaturan.');
 
     const keys = apiKeysString.split(',').map(k => k.trim()).filter(k => k);
     if (keys.length === 0) throw new Error('API Key tidak valid.');
 
-  const truncatedTafsir = arabicTafsirText.length > 3500
-      ? arabicTafsirText.substring(0, 3500) + "... [Teks dipotong agar AI lebih cepat]"
+  const truncatedTafsir = arabicTafsirText.length > 2500
+      ? arabicTafsirText.substring(0, 2500) + "... [Teks dipotong agar AI lebih cepat]"
       : arabicTafsirText;
 
     const prompt = `
@@ -21,7 +21,7 @@ TEKS TAFSIR ARAB (Potongan):
 
 EKSTRAK INFORMASI BERIKUT DALAM BAHASA INDONESIA:
 1. terjemahan: Terjemahan ayat yang puitis dan akurat dalam Bahasa Indonesia.
-2. asbabunNuzul: Latar belakang turunnya ayat jika disebutkan. Jika tidak ada, berikan penjelasan konteks historis singkat. (Maks 1-2 paragraf)
+2. asbabunNuzul: Berikan tafsir mendalam, pembedahan lafaz (jika ada), latar belakang turunnya (Asbabun Nuzul), serta esensi makna yang dijelaskan oleh Ibnu 'Asyur. Jelaskan selengkap dan sedetail mungkin seperti sebuah artikel/essay komprehensif. Gunakan baris baru (\\n\\n) untuk memisahkan antar paragraf agar mudah dibaca.
 3. balaghah: Minimal 2 poin tentang keindahan sastra (Balaghah) yang dijelaskan Ibnu 'Asyur. Berikan judul poin dan deskripsinya.
 4. maqashid: Minimal 2 poin tentang tujuan syari'at atau pesan filosofis utama ayat ini. Berikan judul poin dan deskripsinya.
 5. ustadzPoin: Minimal 4 butir poin (bullets) sebagai bahan khutbah atau ceramah yang relevan dengan kehidupan modern.
@@ -33,7 +33,7 @@ FORMAT OUTPUT HARUS JSON VALID:
   "ayat": ${ayahNumber},
   "arabic": "${ayahArabicText}",
   "terjemahan": "...",
-  "asbabunNuzul": "...",
+  "asbabunNuzul": "Paragraf pertama.\\n\\nParagraf kedua yang menjelaskan tafsir lebih detail.\\n\\nParagraf ketiga...",
   "balaghah": [ { "title": "...", "desc": "..." } ],
   "maqashid": [ { "title": "...", "desc": "..." } ],
   "ustadzPoin": [ "...", "...", "...", "..." ],
@@ -47,11 +47,13 @@ FORMAT OUTPUT HARUS JSON VALID:
 
     while (attempts < keys.length) {
       const activeKey = keys[currentKeyIndex];
-      console.log(`Mencoba Groq API dengan kunci ke-${currentKeyIndex + 1}/${keys.length}`);
+      const attemptMsg = `Mencoba Groq API dengan kunci ke-${currentKeyIndex + 1}/${keys.length}`;
+      console.log(attemptMsg);
+      if (onProgress) onProgress(attemptMsg);
 
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 120000);
+        const timeoutId = setTimeout(() => controller.abort(), 45000);
 
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
@@ -80,7 +82,16 @@ FORMAT OUTPUT HARUS JSON VALID:
         }
 
         const data = await response.json();
-        return JSON.parse(data.choices[0].message.content);
+        let content = data.choices[0].message.content;
+
+        // Membersihkan format markdown jika ada (```json ... ```)
+        if (content.startsWith('```json')) {
+          content = content.replace(/^```json\n?/, '').replace(/\n?```$/, '');
+        } else if (content.startsWith('```')) {
+          content = content.replace(/^```\n?/, '').replace(/\n?```$/, '');
+        }
+
+        return JSON.parse(content);
 
       } catch (error) {
         console.warn(`Kunci ke-${currentKeyIndex + 1} gagal (${attempts + 1}/${keys.length}):`, error.message);

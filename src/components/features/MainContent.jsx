@@ -73,9 +73,9 @@ const MainContent = () => {
             <section>
               <h3 className="text-xl font-bold text-slate-900 mb-4 flex items-center">
                 <BookOpen className="w-6 h-6 text-emerald-600 mr-2" />
-                Asbabun Nuzul
+                Tafsir & Asbabun Nuzul
               </h3>
-              <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm leading-relaxed text-slate-700">
+              <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm leading-relaxed text-slate-700 whitespace-pre-wrap">
                 {activeTafsir.asbabunNuzul}
               </div>
             </section>

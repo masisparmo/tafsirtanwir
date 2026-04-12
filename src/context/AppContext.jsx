@@ -70,6 +70,13 @@ export const AppProvider = ({ children }) => {
     setCurrentVerse({ surah, ayah });
     setIsLoading(true);
 
+    // Pastikan database siap sebelum memicu analisa
+    if (!fullDatabase) {
+      setStatusMessage('Menunggu database tafsir siap...');
+      // Berikan toleransi waktu singkat untuk database me-load jika lambat
+      await new Promise(resolve => setTimeout(resolve, 3000));
+    }
+
     try {
       // 1. Cek di IndexedDB (Lokal)
       setStatusMessage('Mencari di database lokal...');
@@ -124,8 +131,16 @@ export const AppProvider = ({ children }) => {
       const fetchedArabic = await quranService.getAyahText(surah, ayah);
       setActiveTafsir(prev => ({ ...prev, arabic: fetchedArabic || 'Teks tidak tersedia.' }));
       
-      // Jalankan AI secara otomatis
-      await processWithAI({ surah, ayah, arabic: fetchedArabic });
+      // Jalankan AI secara otomatis HANYA JIKA database sudah siap
+      // (processWithAI yang sebenarnya akan dipanggil setelah state activeTafsir ini di-set
+      // jadi kita trigger dari dalam block ini).
+      // Tapi karena processWithAI butuh akses ke fullDatabase saat memanggilnya,
+      // kita harus hati-hati dengan dependency useCallback.
+      if (fullDatabase) {
+         await processWithAI({ surah, ayah, arabic: fetchedArabic });
+      } else {
+         setStatusMessage('Gagal: Database Tafsir belum siap. Mohon muat ulang halaman.');
+      }
 
     } catch (err) {
       console.error('Error changing verse:', err);
@@ -142,7 +157,7 @@ export const AppProvider = ({ children }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [apiKeys]);
+  }, [apiKeys, fullDatabase]);
 
   const processWithAI = async (autoVerse = null) => {
     const targetVerse = autoVerse || currentVerse;
@@ -173,7 +188,8 @@ export const AppProvider = ({ children }) => {
         targetArabic,
         apiKeys,
         surahData.name,
-        targetVerse.ayah
+        targetVerse.ayah,
+        (msg) => setStatusMessage(msg) // Callback UI untuk menampilkan percobaan key
       );
 
       // Simpan ke IndexedDB (Lokal)
