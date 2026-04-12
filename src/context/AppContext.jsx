@@ -173,8 +173,7 @@ export const AppProvider = ({ children }) => {
         targetArabic,
         apiKeys,
         surahData.name,
-        targetVerse.ayah,
-        (msg) => setStatusMessage(msg) // Callback UI untuk menampilkan percobaan key
+        targetVerse.ayah
       );
 
       // Simpan ke IndexedDB (Lokal)
