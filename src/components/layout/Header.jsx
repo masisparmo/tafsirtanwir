@@ -11,8 +11,12 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Logo Section */}
         <div className="flex items-center space-x-3">
-          <div className="bg-emerald-600 p-2 rounded-xl shadow-lg shadow-emerald-200">
-            <BookOpen className="text-white w-6 h-6" />
+          <div className="relative w-12 h-12 flex items-center justify-center overflow-hidden rounded-xl shadow-lg border border-emerald-100">
+            <img 
+              src="/logo-tafsir_tanwir.jpg" 
+              alt="Logo Tafsir Tanwir" 
+              className="w-full h-full object-cover"
+            />
           </div>
           <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-800 to-emerald-600 hidden sm:block">
             Tafsir At Tahrir wat Tanwir
