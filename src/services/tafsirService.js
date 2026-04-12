@@ -1,4 +1,4 @@
-const TAFSIR_URL = 'https://raw.githubusercontent.com/SAFI174/tafsir-json/main/json/ar.tanweer.json';
+const TAFSIR_URL = '/ar.tanweer.json';
 const DB_NAME = 'TafsirAppDB';
 const STORE_NAME = 'tafsirData';
 const CACHE_STORE = 'verseCache';
