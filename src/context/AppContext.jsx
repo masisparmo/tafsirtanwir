@@ -60,6 +60,7 @@ export const AppProvider = ({ children }) => {
       } catch (err) {
         console.error(err);
         setStatusMessage('Gagal memuat database. Periksa koneksi internet.');
+        setIsLoading(false);
       }
     };
     initDB();
@@ -136,7 +137,7 @@ export const AppProvider = ({ children }) => {
         ayat: ayah,
         arabic: 'Gagal memuat teks arab.',
         terjemahan: 'Terjadi kesalahan sistem saat memuat atau menganalisis ayat ini.',
-        isPlaceholder: true,
+        isPlaceholder: false,
         isError: true
       });
     } finally {
@@ -148,7 +149,17 @@ export const AppProvider = ({ children }) => {
     const targetVerse = autoVerse || currentVerse;
     
     if (!fullDatabase) {
-      setStatusMessage('Menunggu database tafsir siap...');
+      setStatusMessage('');
+      setIsLoading(false);
+      const sd = QURAN_METADATA.find(s => s.number === targetVerse.surah);
+      setActiveTafsir({
+        surah: sd ? sd.name : 'Unknown',
+        ayat: targetVerse.ayah,
+        arabic: autoVerse?.arabic || currentVerse.arabic || 'Gagal memuat teks.',
+        terjemahan: 'Gagal memanggil AI: Database referensi (ar.tanweer.json) belum siap atau gagal dimuat karena ukuran file (26MB). Silakan muat ulang halaman atau periksa koneksi Anda.',
+        isPlaceholder: false,
+        isError: true
+      });
       return;
     }
     if (!apiKeys || apiKeys.trim() === "") {
@@ -198,7 +209,7 @@ export const AppProvider = ({ children }) => {
         ayat: targetVerse.ayah,
         arabic: autoVerse?.arabic || activeTafsir.arabic || 'Gagal memuat teks.',
         terjemahan: `Gagal menganalisis ayat: ${err.message}. Silakan coba lagi.`,
-        isPlaceholder: true,
+        isPlaceholder: false,
         isError: true
       });
     } finally {
