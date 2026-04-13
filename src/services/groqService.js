@@ -133,7 +133,12 @@ TEKS TAFSIR ARAB (Potongan Kitab At-Tahrir wat-Tanwir):
 
 BERIKAN PENJELASAN MENDALAM DALAM BAHASA INDONESIA:
 Tuliskan uraian yang komprehensif, terstruktur, dan mendalam seperti output dari sistem analisis canggih, yang mencakup analisis bahasa, pemilihan kata, struktur kalimat, makna teologis, dan keajaiban sastra (balaghah) yang diulas oleh Ibnu 'Asyur.
-Gunakan paragraf yang panjang, poin-poin yang terperinci, dan penjelasan logika kebahasaan yang tajam (misal mengapa kata tunjuk jauh digunakan, mengapa menggunakan masdar, mengapa diakhiri dengan bentuk tertentu, dll). Jangan ragu untuk membuat teks yang panjang dan kaya makna.
+
+INSTRUKSI SANGAT PENTING (HARUS DIIKUTI):
+1. Anda WAJIB MENGACU SEPENUHNYA pada TEKS TAFSIR ARAB At-Tahrir wat-Tanwir yang dilampirkan di atas.
+2. JANGAN membuat analisis, tafsir, atau penjelasan umum yang tidak ada dasarnya di teks tersebut.
+3. Sebutkan secara eksplisit temuan-temuan Ibnu 'Asyur dari teks tersebut (contoh: "Berdasarkan teks di atas, Ibnu 'Asyur menjelaskan...").
+4. Gunakan paragraf yang panjang, poin-poin yang terperinci, dan penjelasan logika kebahasaan yang tajam yang diuraikan langsung oleh Ibnu 'Asyur di teks bahasa Arab tersebut. Jangan ragu untuk membuat teks yang panjang dan kaya makna, tetapi pastikan sumber pemikirannya HANYA dari potongan kitab tersebut.
 
 FORMAT OUTPUT HARUS JSON VALID DENGAN SATU KEY UTAMA "penjelasanDetail" yang berisi string format Markdown dari uraian Anda:
 {
