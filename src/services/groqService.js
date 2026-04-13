@@ -131,14 +131,16 @@ AYAT: "${ayahArabicText}" (${surahName} ayat ${ayahNumber})
 TEKS TAFSIR ARAB (Potongan Kitab At-Tahrir wat-Tanwir):
 "${truncatedTafsir}"
 
-BERIKAN PENJELASAN MENDALAM DALAM BAHASA INDONESIA:
-Tuliskan uraian yang komprehensif, terstruktur, dan mendalam seperti output dari sistem analisis canggih, yang mencakup analisis bahasa, pemilihan kata, struktur kalimat, makna teologis, dan keajaiban sastra (balaghah) yang diulas oleh Ibnu 'Asyur.
+BERIKAN PENJELASAN MENDALAM DALAM BAHASA INDONESIA YANG SANGAT TEKNIS DAN ANALITIS:
+Tuliskan bedah tata bahasa, etimologi (akar kata), dan rasionalitas teologis secara komprehensif seperti output sistem analisis canggih (contoh: Google NotebookLM).
+Fokus Anda adalah membedah ayat ini dari *Perspektif Linguistik & Teologis* murni berdasarkan teks Ibnu 'Asyur yang dilampirkan.
 
 INSTRUKSI SANGAT PENTING (HARUS DIIKUTI):
-1. Anda WAJIB MENGACU SEPENUHNYA pada TEKS TAFSIR ARAB At-Tahrir wat-Tanwir yang dilampirkan di atas.
-2. JANGAN membuat analisis, tafsir, atau penjelasan umum yang tidak ada dasarnya di teks tersebut.
-3. Sebutkan secara eksplisit temuan-temuan Ibnu 'Asyur dari teks tersebut (contoh: "Berdasarkan teks di atas, Ibnu 'Asyur menjelaskan...").
-4. Gunakan paragraf yang panjang, poin-poin yang terperinci, dan penjelasan logika kebahasaan yang tajam yang diuraikan langsung oleh Ibnu 'Asyur di teks bahasa Arab tersebut. Jangan ragu untuk membuat teks yang panjang dan kaya makna, tetapi pastikan sumber pemikirannya HANYA dari potongan kitab tersebut.
+1. FOKUS LINGUISTIK & GRAMATIKAL: Analisis secara teknis penggunaan jenis kalimat (misal: jumlah ismiyyah vs fi'liyyah), I'rab (rafa', nashab, dll), pemilihan struktur kata, dan makna etimologis akar bahasanya.
+2. FOKUS BALAGHAH & TEOLOGI: Jelaskan aspek sastra seperti Qasr (pembatasan), Majaz, Ta'lil (rasionalitas/pemberian alasan), atau fungsi Mubalaghah.
+3. GUNAKAN TERMINOLOGI ARAB: Sertakan istilah-istilah tata bahasa/sastra bahasa Arab aslinya dalam kurung (contoh: ad-dawam wa ats-tsubut, at-tanbih 'ala al-istihaq ad-dzaati, dll) sesuai yang ada di teks.
+4. SUMBER HARUS ASLI: Anda WAJIB MENGACU SEPENUHNYA pada TEKS TAFSIR ARAB At-Tahrir wat-Tanwir yang dilampirkan. JANGAN membuat analisis umum, filosofis bebas, atau mengarang tafsir yang tidak ada di teks tersebut. Kutip pendapat Ibnu 'Asyur secara langsung.
+5. FORMAT POIN TERPERINCI: Gunakan format Numbering/Poin untuk memisahkan setiap analisis teknis (misal: 1. Makna Tata Bahasa pada..., 2. Eksklusivitas Hakikat..., dst).
 
 FORMAT OUTPUT HARUS JSON VALID DENGAN SATU KEY UTAMA "penjelasanDetail" yang berisi string format Markdown dari uraian Anda:
 {
