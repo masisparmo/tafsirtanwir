@@ -109,5 +109,103 @@ FORMAT OUTPUT HARUS JSON VALID:
     }
 
     throw new Error(`Semua ${keys.length} API Key telah dicoba dan gagal. Error terakhir: ${lastErrorMessage}`);
+  },
+
+  async extractDetailTafsirInfo(arabicTafsirText, ayahArabicText, apiKeysString, surahName, ayahNumber, onProgress) {
+    if (!apiKeysString) throw new Error('API Key belum diatur. Silakan atur di menu Pengaturan.');
+
+    const keys = apiKeysString.split(',').map(k => k.trim()).filter(k => k);
+    if (keys.length === 0) throw new Error('API Key tidak valid.');
+
+    // Memaksimalkan konteks, batas diperbesar atau tidak dipotong tergantung ukuran, kita batasi agak besar
+    const truncatedTafsir = arabicTafsirText.length > 8000
+      ? arabicTafsirText.substring(0, 8000) + "... [Teks dipotong agar tidak melebihi batas token]"
+      : arabicTafsirText;
+
+    const prompt = `
+Anda adalah ahli Tafsir Al-Qur'an, ahli tata bahasa Arab, ahli sastra Arab, dan pakar bahasa Arab yang sangat mahir dan mendalam.
+Tugas Anda adalah membaca potongan Kitab Tafsir At-Tahrir wat-Tanwir karya Ibnu 'Asyur (Bahasa Arab) untuk ayat tertentu dan memberikan penjelasan yang SANGAT DETAIL, PANJANG, dan KOMPREHENSIF.
+Tujuan penjelasan ini adalah untuk menguraikan kemukjizatan, keajaiban, pemilihan kata, tata bahasa, dan sastra pada ayat tersebut sehingga pembaca semakin beriman kepada Al-Qur'an.
+
+AYAT: "${ayahArabicText}" (${surahName} ayat ${ayahNumber})
+TEKS TAFSIR ARAB (Potongan Kitab At-Tahrir wat-Tanwir):
+"${truncatedTafsir}"
+
+BERIKAN PENJELASAN MENDALAM DALAM BAHASA INDONESIA:
+Tuliskan uraian yang komprehensif, terstruktur, dan mendalam seperti output dari sistem analisis canggih, yang mencakup analisis bahasa, pemilihan kata, struktur kalimat, makna teologis, dan keajaiban sastra (balaghah) yang diulas oleh Ibnu 'Asyur.
+Gunakan paragraf yang panjang, poin-poin yang terperinci, dan penjelasan logika kebahasaan yang tajam (misal mengapa kata tunjuk jauh digunakan, mengapa menggunakan masdar, mengapa diakhiri dengan bentuk tertentu, dll). Jangan ragu untuk membuat teks yang panjang dan kaya makna.
+
+FORMAT OUTPUT HARUS JSON VALID DENGAN SATU KEY UTAMA "penjelasanDetail" yang berisi string format Markdown dari uraian Anda:
+{
+  "penjelasanDetail": "Tuliskan uraian lengkap dan mendalam Anda di sini dalam format Markdown..."
+}
+`;
+
+    let attempts = 0;
+    let lastErrorMessage = '';
+
+    while (attempts < keys.length) {
+      const activeKey = keys[currentKeyIndex];
+      const attemptMsg = `Mencoba Groq API untuk Penjelasan Detail dengan kunci ke-${currentKeyIndex + 1}/${keys.length}`;
+      console.log(attemptMsg);
+      if (onProgress) onProgress(attemptMsg);
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000); // Waktu lebih lama untuk detail
+
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${activeKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: 'llama-3.3-70b-versatile',
+            messages: [
+              { role: 'system', content: 'Anda adalah asisten ahli Tafsir dan Sastra Arab yang selalu memberikan output penjelasan mendalam dalam format JSON valid.' },
+              { role: 'user', content: prompt }
+            ],
+            temperature: 0.3,
+            response_format: { type: 'json_object' }
+          }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          const msg = err.error?.message || `HTTP Error ${response.status}`;
+          throw new Error(msg);
+        }
+
+        const data = await response.json();
+        let content = data.choices[0].message.content;
+
+        if (content.startsWith('```json')) {
+          content = content.replace(/^```json\n?/, '').replace(/\n?```$/, '');
+        } else if (content.startsWith('```')) {
+          content = content.replace(/^```\n?/, '').replace(/\n?```$/, '');
+        }
+
+        return JSON.parse(content);
+
+      } catch (error) {
+        console.warn(`Kunci ke-${currentKeyIndex + 1} gagal (${attempts + 1}/${keys.length}):`, error.message);
+        lastErrorMessage = error.message;
+
+        // Rotasi ke kunci berikutnya untuk percobaan selanjutnya
+        currentKeyIndex = (currentKeyIndex + 1) % keys.length;
+        attempts++;
+
+        // Berikan jeda sangat singkat sebelum mencoba kunci berikutnya
+        if (attempts < keys.length) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+    }
+
+    throw new Error(`Semua ${keys.length} API Key telah dicoba dan gagal. Error terakhir: ${lastErrorMessage}`);
   }
 };
