@@ -29,6 +29,9 @@ export const AppProvider = ({ children }) => {
   const [dbDownloadProgress, setDbDownloadProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState('');
 
+  // State for detail explanation
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
+
   // Perubahan Mode mempengaruhi Tab
   useEffect(() => {
     localStorage.setItem('tafsir_mode', mode);
@@ -119,7 +122,8 @@ export const AppProvider = ({ children }) => {
         balaghah: [],
         maqashid: [],
         ustadzPoin: [],
-        kuis: []
+        kuis: [],
+        penjelasanDetail: null
       });
 
       const fetchedArabic = await quranService.getAyahText(surah, ayah);
@@ -217,6 +221,59 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const processDetailWithAI = async () => {
+    if (!fullDatabase || !activeTafsir || activeTafsir.isPlaceholder || activeTafsir.isError) {
+      return;
+    }
+    if (!apiKeys || apiKeys.trim() === "") {
+      setStatusMessage('API Key belum diatur. Silakan cek Pengaturan.');
+      setIsSettingsOpen(true);
+      return;
+    }
+
+    setIsDetailLoading(true);
+    setStatusMessage('AI sedang menyusun penjelasan detail mendalam...');
+
+    try {
+      const rawReport = await tafsirService.getTafsirForAyah(fullDatabase, currentVerse.surah, currentVerse.ayah);
+      const surahData = QURAN_METADATA.find(s => s.number === currentVerse.surah);
+
+      const targetArabic = activeTafsir.arabic;
+
+      const result = await groqService.extractDetailTafsirInfo(
+        rawReport,
+        targetArabic,
+        apiKeys,
+        surahData.name,
+        currentVerse.ayah,
+        (msg) => setStatusMessage(msg)
+      );
+
+      const updatedTafsir = {
+        ...activeTafsir,
+        penjelasanDetail: result.penjelasanDetail
+      };
+
+      // Simpan ke IndexedDB (Lokal)
+      await tafsirService.saveCachedVerse(currentVerse.surah, currentVerse.ayah, updatedTafsir);
+
+      // Simpan ke Cloud (Google Sheets)
+      if (GAS_URL) {
+        setStatusMessage('Menyinkronkan penjelasan detail ke Cloud...');
+        await gasService.saveToCloud(GAS_URL, currentVerse.surah, currentVerse.ayah, updatedTafsir);
+      }
+
+      setActiveTafsir(updatedTafsir);
+      setStatusMessage('');
+    } catch (err) {
+      console.error(err);
+      setStatusMessage('Gagal menyusun penjelasan detail: ' + err.message);
+    } finally {
+      setIsDetailLoading(false);
+      setStatusMessage('');
+    }
+  };
+
   return (
     <AppContext.Provider value={{ 
       mode, setMode, 
@@ -229,6 +286,8 @@ export const AppProvider = ({ children }) => {
       dbDownloadProgress,
       isSettingsOpen, setIsSettingsOpen,
       processWithAI,
+      processDetailWithAI,
+      isDetailLoading,
       QURAN_METADATA
     }}>
       {children}

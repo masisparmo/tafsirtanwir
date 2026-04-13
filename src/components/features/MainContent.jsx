@@ -1,14 +1,15 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, Sparkles, Target, Highlighter, Wand2, Loader2 } from 'lucide-react';
+import { BookOpen, Sparkles, Target, Highlighter, Wand2, Loader2, FileText } from 'lucide-react';
 import Quiz from './Quiz';
 import UstadzPoints from './UstadzPoints';
+import ReactMarkdown from 'react-markdown';
 
 const MainContent = () => {
   const { 
     mode, activeTab, activeTafsir, isLoading, 
-    processWithAI, statusMessage, apiKeys, setIsSettingsOpen 
+    processWithAI, processDetailWithAI, isDetailLoading, statusMessage, apiKeys, setIsSettingsOpen
   } = useApp();
 
   const renderContent = () => {
@@ -93,6 +94,47 @@ const MainContent = () => {
                   </div>
                 ))}
               </div>
+
+              {!activeTafsir.penjelasanDetail && !isDetailLoading && (
+                <div className="mt-8 text-center">
+                  <button
+                    onClick={processDetailWithAI}
+                    className="inline-flex items-center px-6 py-3 bg-amber-50 text-amber-700 rounded-xl text-sm font-bold hover:bg-amber-100 transition-colors border border-amber-200 shadow-sm"
+                  >
+                    <Wand2 className="w-5 h-5 mr-2" />
+                    Buka Penjelasan Detail (Mendalam)
+                  </button>
+                  <p className="text-xs text-slate-500 mt-2">
+                    AI akan menganalisis teks kitab secara komprehensif untuk mengungkap keindahan bahasa dan makna teologis.
+                  </p>
+                </div>
+              )}
+
+              {isDetailLoading && (
+                <div className="mt-8 bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center space-y-4">
+                  <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+                  <div>
+                    <h4 className="font-bold text-slate-900 mb-1">Menganalisis Kitab...</h4>
+                    <p className="text-sm text-slate-500">Menyusun penjelasan mendalam tentang balaghah dan makna ayat ini. Proses ini bisa memakan waktu hingga 1 menit.</p>
+                  </div>
+                </div>
+              )}
+
+              {activeTafsir.penjelasanDetail && !isDetailLoading && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="mt-8 bg-white p-8 rounded-2xl border border-amber-200 shadow-md"
+                >
+                  <h4 className="text-xl font-bold text-slate-900 mb-6 flex items-center border-b border-amber-100 pb-4">
+                    <FileText className="w-6 h-6 text-amber-600 mr-2" />
+                    Penjelasan Detail & Mendalam
+                  </h4>
+                  <div className="prose prose-emerald max-w-none text-slate-700">
+                    <ReactMarkdown>{activeTafsir.penjelasanDetail}</ReactMarkdown>
+                  </div>
+                </motion.div>
+              )}
             </section>
           </motion.div>
         );
